@@ -38,7 +38,7 @@ GetOptions ("i=s" => \$in,  # input
                         
 if($help || !$in){
   print "Usage:\n\n";
-  print "\t-i\tinput - single fasta file(it only uses the first fasta seq)\n";
+  print "\t-i\tinput - ASCII file\n";
   print "\t-q\tquite - quite mode\n";
   print "\t-t\tterminating symbol\n";
 
