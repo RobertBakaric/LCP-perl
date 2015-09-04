@@ -1,0 +1,70 @@
+
+=head1 NAME
+
+LCP - Longest common prefix computation 
+
+=head1 SYNOPSIS
+
+    use LCP::Kasai;
+
+    my $lcp = LCP::Kasai->new();
+
+    
+    # -----        Compute suffix array        ----- #
+    my @suftab = $lcp->_sort_suffixes(array => \@array);
+
+    # -----         Compute lcp array          ----- #
+    my ($height,$sufinv) =$lcp->_kasai(suftab => \@suftab, string => \@array);
+
+=head1 DESCRIPTION
+
+The longest common prefix (LCP) array is an auxiliary data struc-
+ture to the suffix array. The array containes lengths of the longest
+common prefixes (LCPs) between all pairs of consecutive suffixes
+in a sorted suffix array. The algorithms presented here are 
+implementations of: Kasai’s linear time LCP construction strategy [1] ...
+
+
+=head2 new
+
+    my $lcp = LCP::Kasai->new();
+
+Creates a new longest common prefix object.
+
+=head2 _sort_suffixes
+
+    my @suftab = $lcp->_sort_suffixes(array => \@array);
+
+Where \@array is an array reference of string characters.
+
+Function returns the lexicographically sorted array of indexes 
+corresponding to starting positions of string suffixes. Function 
+is a simple quicksort based sorting lagorithm with O(n log n) 
+worst case runtime behaviour.
+
+=head2 _kasai
+    
+    my ($height,$sufinv) =$lcp->_kasai(suftab => \@suftab, string => \@array);
+    
+
+Function requires a sorted suffix array (suftab) and a string (string)
+both as array references. As a result it returns the computed LCP array
+(height - term used by Kasai et al.) and a rank array (an array invers 
+to the suffix array)
+
+
+=head1 AUTHOR
+
+Robert Bakaric <rbakaric@irb.hr>
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+=head1 ACKNOWLEDGEMENT
+
+1.  Kasai et al. Linear-Time Longest-Common-Prefix Computation in 
+    Suffix Arrays and Its Applications. 2001.
+
+=cut
