@@ -2,19 +2,24 @@
 =head1 NAME
 
 LCP - Longest common prefix computation 
+SA  - SuffixArray computation
 
 =head1 SYNOPSIS
 
     use LCP::Kasai;
+    use LCP::Karkkainen;
+    use SA::SuffixArray;
 
-    my $lcp = LCP::Kasai->new();
-
+    my $lcp1K = LCP::Kasai->new();
+    my $lcp3K = LCP::Karkkainen->new();
+    my $sa = SA::SuffixArray->new();
     
     # -----        Compute suffix array        ----- #
-    my @suftab = $lcp->_sort_suffixes(array => \@array);
+    my @suftab = $sa->Sort_Suffixes(array => \@array);
 
     # -----         Compute lcp array          ----- #
-    my ($height,$sufinv) =$lcp->_kasai(suftab => \@suftab, string => \@array);
+    my ($height,$sufinv) =$lcp1K->Kasai(suftab => \@suftab, string => \@array);
+    my ($height,$sufinv) =$lcp3K->Karkkainen(suftab => \@suftab, string => \@array);
 
 =head1 DESCRIPTION
 
@@ -22,18 +27,26 @@ The longest common prefix (LCP) array is an auxiliary data struc-
 ture to the suffix array. The array containes lengths of the longest
 common prefixes (LCPs) between all pairs of consecutive suffixes
 in a sorted suffix array. The algorithms presented here are 
-implementations of: Kasai’s linear time LCP construction strategy [1] ...
+implementations of: Kasai’s linear time LCP construction strategy [1], 
+Karkkainen's PLCP based LCP construction strategy [2]...
 
 
 =head2 new
 
-    my $lcp = LCP::Kasai->new();
-
+    my $lcp1K = LCP::Kasai->new();
+    my $lcp3K = LCP::Karkkainen->new();
+    
+    
 Creates a new longest common prefix object.
+
+    my $sa = SA::SuffixArray->new();
+    
+Creates a new suffix array object.    
+    
 
 =head2 _sort_suffixes
 
-    my @suftab = $lcp->_sort_suffixes(array => \@array);
+    my @suftab = $sa->Sort_Suffixes(array => \@array);
 
 Where \@array is an array reference of string characters.
 
@@ -42,15 +55,26 @@ corresponding to starting positions of string suffixes. Function
 is a simple quicksort based sorting lagorithm with O(n log n) 
 worst case runtime behaviour.
 
-=head2 _kasai
+=head2 Kasai
     
-    my ($height,$sufinv) =$lcp->_kasai(suftab => \@suftab, string => \@array);
+    my ($height,$sufinv) =$lcp1K->Kasai(suftab => \@suftab, string => \@array);
     
 
 Function requires a sorted suffix array (suftab) and a string (string)
 both as array references. As a result it returns the computed LCP array
 (height - term used by Kasai et al.) and a rank array (an array invers 
 to the suffix array)
+
+=head2 Karkkainen
+    
+    my ($lcparray,$plcparray) =$lcp3K->Kasai(suftab => \@suftab, string => \@array);
+    
+
+Function requires a sorted suffix array (suftab) and a string (string)
+both as array references. As a result it returns the computed LCP array
+and a PLCP array (an array of permuted PLCP values as they appear in a 
+string)
+
 
 
 =head1 AUTHOR
@@ -59,12 +83,30 @@ Robert Bakaric <rbakaric@irb.hr>
 
 =head1 LICENSE
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself. 
+  
+#  Copyright 2015 Robert Bakaric <rbakaric@irb.hr>
+#  
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#  
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#  
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+#  MA 02110-1301, USA.
+#  
+#  
 
 =head1 ACKNOWLEDGEMENT
 
 1.  Kasai et al. Linear-Time Longest-Common-Prefix Computation in 
     Suffix Arrays and Its Applications. 2001.
-
+    
+2.  Karkkainen et al. Permuted Longest-Common-Prefix Array. 2009.
 =cut

@@ -23,16 +23,22 @@
 
 use strict;
 use Getopt::Long;
+use SA::SuffixArray;
 use LCP::Kasai;
+use LCP::Karkkainen;
 use File::Slurp;
 
 
-my $lcp = LCP::Kasai->new();
+my $lcp1K = LCP::Kasai->new();
+my $lcp3K = LCP::Karkkainen->new();
+my $sa = SA::SuffixArray->new();
 
-my ($help,$in,$quite,$terminator);
+
+my ($help,$in,$quite,$terminator, $kk);
 GetOptions ("i=s" => \$in,  # input 
             "h" => \$help,
             "q" => \$quite,
+            "k=s" => \$kk,
             "t=s" => \$terminator
             );
                         
@@ -40,6 +46,7 @@ if($help || !$in){
   print "Usage:\n\n";
   print "\t-i\tinput - ASCII file\n";
   print "\t-q\tquite - quite mode\n";
+  print "\t-k\tKasao = k , Karkkainine = kkk\n";
   print "\t-t\tterminating symbol\n";
 
   exit(0);
@@ -47,7 +54,7 @@ if($help || !$in){
 
 # -----              Set Defs              ----- #
 $terminator = "\$" unless $terminator;
-
+$kk = "k" unless $kk;
 
 # -----              Read File             ----- #
 my $content = read_file($in) ;
@@ -58,22 +65,30 @@ $content .= $terminator;
 my @array = split("",$content);
 
 # -----        Compute suffix array        ----- #
-my @suftab = $lcp->_sort_suffixes(array => \@array);
+my @suftab = $sa->Sort_Suffixes(array => \@array);
 
 
 # -----         Compute lcp array          ----- #
-my ($height,$sufinv) =$lcp->_kasai(suftab => \@suftab,
-                                string => \@array);
-
+my ($height,$sufinv, $plcp);
+if ($kk eq 'k'){
+   ($height,$sufinv) =$lcp1K->Kasai(suftab => \@suftab,
+                                        string => \@array);
+}elsif($kk eq 'kkk'){
+   ($height,$plcp) =$lcp3K->Karkkainen(suftab => \@suftab,
+                                    string => \@array);
+}
 
 
 # -----         Printing results           ----- #
 if ($quite <=0){
-   print "#Hight:0 @{$height}\n";
-   print "\n#Rank:@{$sufinv}\n";
+   print "#Hight:0 @{$height}\n"; 
+   print "\n#Rank:@{$sufinv}\n" if $sufinv;
+   print "\nPLCP: @{$plcp}\n" if $plcp;
    print "\n#Position:@suftab\n\n" ;
 }
+
 my $b =0;
+
 for(my $r=0;$r<@{$height};$r++){
    print $height->[$r] ? "$height->[$r]\t" : "0\t";
    print $suftab[$r]+1 . "\t";

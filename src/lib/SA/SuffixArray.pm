@@ -1,4 +1,4 @@
-#  Kasai.pm
+#  SuffixArray.pm
 #  
 #  Copyright 2015 Robert Bakaric <rbakaric@irb.hr>
 #  
@@ -19,7 +19,8 @@
 #  
 #  
 
-package LCP::Kasai;
+
+package SA::SuffixArray;
 
 use vars qw($VERSION);
 
@@ -31,17 +32,16 @@ use Carp;
 
 =head1 NAME
 
-LCP::Kasai - Longest common prefix computation 
+SA::SuffixArray - Suffix array computation 
 
 =head1 SYNOPSIS
 
-    use LCP::Kasai;
+    use SA::SuffixArray;
 
-    my $lcp = LCP::Kasai->new();
+    my $lcp = SA::SuffixArray->new();
 
-
-    # -----         Compute lcp array          ----- #
-    my ($height,$sufinv) =$lcp->Kasai(suftab => \@suftab, string => \@array);
+    # -----         Compute sa array          ----- #
+    my @suftab = $lcp->_sort_suffixes(array => \@array);
 
 =head1 DESCRIPTION
 
@@ -54,19 +54,20 @@ implementation of Kasai’s linear time LCP construction solution [1].
 
 =head2 new
 
-    my $lcp = LCP::Kasai->new();
+    my $sa = SA::SuffixArray->new();
 
-Creates a new longest common prefix object.
+Creates a new suffix object.
 
-=head2 Kasai
-    
-    my ($height,$sufinv) =$lcp->_kasai(suftab => \@suftab, string => \@array);
-    
+=head2 _sort_suffixes
 
-Function requires a sorted suffix array (suftab) and a string (string)
-both as array references. As a result it returns the computed LCP array
-(height - term used by Kasai et al.) and a rank array (@sufinv - an 
-array invers to the suffix array)
+    my @suftab = $sa->Sort_Suffixes(array => \@array);
+
+Where \@array is an array reference of string characters.
+
+Function returns the lexicographically sorted array of indexes 
+corresponding to starting positions of string suffixes. Function 
+is a simple quicksort based sorting lagorithm with O(n log n) 
+worst case runtime behaviour.
 
 
 =head1 AUTHOR
@@ -80,8 +81,6 @@ it under the same terms as Perl itself.
 
 =head1 ACKNOWLEDGEMENT
 
-Kasai et al. Linear-Time Longest-Common-Prefix Computation in 
-Suffix Arrays and Its Applications. 2001.
 
 =cut
 
@@ -102,37 +101,16 @@ bless ($hash,$class);
 
 
 #################################################
-#               FUNCTIONS
+sub Sort_Suffixes {  # Sorting
 #################################################
-#################################################
-sub Kasai {  # Kasai's algorithm
-#################################################
-
 my ($self,%arg) = @_;
 
-my @sufinv = ();
-for (0..$#{$arg{string}}){
-	$sufinv[$arg{suftab}->[$_]] = $_;
-}
-my $h = 0;
+return
+   map  { $_->[ 0 ] }
+   sort { $a->[ 1 ] cmp $b->[ 1 ] }
+   map  { [ $_, join q{}, @{$arg{array}}[ $_ .. $#{$arg{array}} ] ] }
+   0 .. $#{$arg{array}};
 
-my @height = ();
-for (0..$#{$arg{string}}){ 
-	if($sufinv[$_] >= 1){
-		my $k = $arg{suftab}->[$sufinv[$_] - 1];
-		while($arg{string}->[$_ + $h] eq $arg{string}->[$k + $h]){
-			$h++;
-		}
-		$height[$sufinv[$_]] = $h;
-		if($h>0){
-			$h--;
-		}
-		else{
-			$h = 0;
-		}
-	}
-}
-return (\@height,\@sufinv);
 }
 
 1;

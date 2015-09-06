@@ -1,14 +1,15 @@
 use ExtUtils::MakeMaker;
-system("mkdir lib");
-system ("cp -r src/lib/LCP ./lib/"); 
+
+system("cp -r src/lib .");
 
 WriteMakefile(
 	NAME		=> 'LCP',
-	VERSION_FROM	=> 'src/lib/LCP/Kasai.pm',
+	VERSION	=> '1.00',
+#	PMLIBDIRS =>  [ 'src/lib', '$(BASEEXT)' ] ,
 #	TO_INST_PM => 'src/lib',
 	dist		=> { 'COMPRESS' => 'gzip' },
 	PREREQ_PM => {
-        # Require Getopt::Long at least 2.42
+        # Require Getopt::Long at least 0
         "Getopt::Long" => 0,
         # Require any version of File::Slurp
         "File::Slurp" => 0,

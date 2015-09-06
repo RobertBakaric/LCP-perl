@@ -9,7 +9,8 @@ demo/Test
 doc/LCP.pdf
 src/apps/LCP.pl
 src/lib/LCP/Kasai.pm
-src/lib/LCP/Puglis.pm
+src/lib/LCP/Karkkainen.pm
+src/lib/SA/SuffixArray.pm
 
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

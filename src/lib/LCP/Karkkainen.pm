@@ -1,4 +1,4 @@
-#  Kasai.pm
+#  Karkkainen.pm
 #  
 #  Copyright 2015 Robert Bakaric <rbakaric@irb.hr>
 #  
@@ -19,7 +19,8 @@
 #  
 #  
 
-package LCP::Kasai;
+
+package LCP::Karkkainen;
 
 use vars qw($VERSION);
 
@@ -35,13 +36,12 @@ LCP::Kasai - Longest common prefix computation
 
 =head1 SYNOPSIS
 
-    use LCP::Kasai;
+    use LCP::Karkkainen;
 
-    my $lcp = LCP::Kasai->new();
-
+    my $lcp = LCP::Karkkainen->new();
 
     # -----         Compute lcp array          ----- #
-    my ($height,$sufinv) =$lcp->Kasai(suftab => \@suftab, string => \@array);
+    my ($lcparray,$plcparray) =$lcp->Karkkainen(suftab => \@suftab, string => \@array);
 
 =head1 DESCRIPTION
 
@@ -54,19 +54,19 @@ implementation of Kasai’s linear time LCP construction solution [1].
 
 =head2 new
 
-    my $lcp = LCP::Kasai->new();
+    my $lcp = LCP::Karkkainen->new();
 
 Creates a new longest common prefix object.
 
-=head2 Kasai
+=head2 Karkkainen
     
-    my ($height,$sufinv) =$lcp->_kasai(suftab => \@suftab, string => \@array);
+    my ($lcparray,$plcparray) =$lcp->Karkkainen(suftab => \@suftab, string => \@array);
     
 
 Function requires a sorted suffix array (suftab) and a string (string)
 both as array references. As a result it returns the computed LCP array
-(height - term used by Kasai et al.) and a rank array (@sufinv - an 
-array invers to the suffix array)
+and a PLCP array (an array of permuted PLCP values as they appear in a 
+string)
 
 
 =head1 AUTHOR
@@ -105,34 +105,41 @@ bless ($hash,$class);
 #               FUNCTIONS
 #################################################
 #################################################
-sub Kasai {  # Kasai's algorithm
+sub Karkkainen {  # Karkkainen's algorithm
 #################################################
 
 my ($self,%arg) = @_;
 
-my @sufinv = ();
-for (0..$#{$arg{string}}){
-	$sufinv[$arg{suftab}->[$_]] = $_;
-}
-my $h = 0;
+my @fi = ();
+my @plcp = ();
+my @lcp = ();
 
-my @height = ();
-for (0..$#{$arg{string}}){ 
-	if($sufinv[$_] >= 1){
-		my $k = $arg{suftab}->[$sufinv[$_] - 1];
-		while($arg{string}->[$_ + $h] eq $arg{string}->[$k + $h]){
-			$h++;
-		}
-		$height[$sufinv[$_]] = $h;
-		if($h>0){
-			$h--;
-		}
-		else{
-			$h = 0;
-		}
-	}
+#  --  Compute fi array  --  #
+for (0..$#{$arg{string}}){
+	$fi[$arg{suftab}->[$_]] = $arg{suftab}->[$_-1];
 }
-return (\@height,\@sufinv);
+
+my $h = 0;
+my $k=0;
+
+#  --  Compute plcp array  --  #
+
+for (0..$#{$arg{string}}){
+   $k = $fi[$_];
+   while($arg{string}->[$_ + $h] eq $arg{string}->[$k + $h]){
+      $h++;
+   }
+   $plcp[$_] = $h;
+   $h=0;
+}
+
+#  --  Compute lcp array  --  #
+
+for (0..$#{$arg{string}}){
+   $lcp[$_] = $plcp[$arg{suftab}->[$_]];
+}
+
+return (\@lcp,\@plcp);
 }
 
 1;

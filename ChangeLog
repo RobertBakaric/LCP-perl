@@ -1,2 +1,7 @@
 2015-09-02  Robert Bakaric  <rbakaric@irb.hr>
 	* Created! 
+
+2015-09-06  Robert Bakaric  <rbakaric@irb.hr>
+	* Addes the suffix array computation function (SA::SuffixArray)
+	* Added the Karkkainen's PLCP base LCP computation
+	* Modified documentation and readme file
