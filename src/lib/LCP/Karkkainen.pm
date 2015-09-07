@@ -131,7 +131,7 @@ for (0..$#{$arg{string}}){
       $h++;
    }
    $plcp[$_] = $h;
-   $h-- if $h>0;
+   ($h>0) ? ($h--) : ($h = 0);
 }
 
 #  --  Compute lcp array  --  #
