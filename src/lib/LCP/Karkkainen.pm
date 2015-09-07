@@ -125,12 +125,13 @@ my $k=0;
 #  --  Compute plcp array  --  #
 
 for (0..$#{$arg{string}}){
+
    $k = $fi[$_];
    while($arg{string}->[$_ + $h] eq $arg{string}->[$k + $h]){
       $h++;
    }
    $plcp[$_] = $h;
-   $h=0;
+   $h-- if $h>0;
 }
 
 #  --  Compute lcp array  --  #
