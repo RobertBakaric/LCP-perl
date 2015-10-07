@@ -1,19 +1,49 @@
 use ExtUtils::MakeMaker;
 
-system("cp -r src/lib .");
+mkdir "./lib";
+mkdir "./lib/LCP";
+mkdir "./lib/SA";
+mkdir "./t/";
+system("cp src/lib/LCP/* ./lib/LCP");
+system("cp  src/lib/SA/* ./lib/SA");
+system("cp  src/t/* ./t/");
+system("cp  src/apps/* ./bin/");
+
 
 WriteMakefile(
 	NAME		=> 'LCP',
-	VERSION	=> '1.00',
-#	PMLIBDIRS =>  [ 'src/lib', '$(BASEEXT)' ] ,
-#	TO_INST_PM => 'src/lib',
+	AUTHOR   => q{Robert Bakaric <rbakaric@irb.hr>},
+	LICENSE  => 'GNU GENERAL PUBLIC LICENSE Version 3',
+	ABSTRACT => 'Longest Common Prexif Array Computational Strategies',
+	VERSION	=> '0.01',
+
 	dist		=> { 'COMPRESS' => 'gzip' },
 	PREREQ_PM => {
-        # Require Getopt::Long at least 0
-        "Getopt::Long" => 0,
-        # Require any version of File::Slurp
-        "File::Slurp" => 0,
-    }
+        # Require Test::More 
+        "Test::More"   => 0,
+    },
+    META_ADD => {
+        provides => {
+            'LCP::Karkkainen' => {
+               file => 'Karkkainen.pm',
+               version => '0.01',
+            },
+            'LCP::Kasai' => {
+               file => 'Kasai.pm',
+               version => '0.01',
+            },
+            'LCP::Manzini' => {
+               file => 'Manzini.pm',
+               version => '0.01',
+            },
+            'LCP::Bakaric' => {
+               file => 'Bakaric.pm',
+               version => '0.01',
+            },
+            'SA::SuffixArray' => {
+               file => 'SuffixArray.pm',
+               version => '0.01',
+            },
+        },
+    },
 );
-
-

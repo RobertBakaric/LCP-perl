@@ -1,7 +1,7 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "Longest Common Prexif Array Computational Strategies",
    "author" : [
-      "unknown"
+      "Robert Bakaric <rbakaric@irb.hr>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
@@ -32,11 +32,32 @@
       },
       "runtime" : {
          "requires" : {
-            "File::Slurp" : "0",
-            "Getopt::Long" : "0"
+            "Test::More" : "0"
          }
       }
    },
+   "provides" : {
+      "LCP::Bakaric" : {
+         "file" : "Bakaric.pm",
+         "version" : "0.01"
+      },
+      "LCP::Karkkainen" : {
+         "file" : "Karkkainen.pm",
+         "version" : "0.01"
+      },
+      "LCP::Kasai" : {
+         "file" : "Kasai.pm",
+         "version" : "0.01"
+      },
+      "LCP::Manzini" : {
+         "file" : "Manzini.pm",
+         "version" : "0.01"
+      },
+      "SA::SuffixArray" : {
+         "file" : "SuffixArray.pm",
+         "version" : "0.01"
+      }
+   },
    "release_status" : "stable",
-   "version" : "1.00"
+   "version" : "0.01"
 }

@@ -1,4 +1,4 @@
-#  Kasai.pm
+#  Manzini.pm
 #  
 #  Copyright 2015 Robert Bakaric <rbakaric@irb.hr>
 #  
@@ -19,7 +19,7 @@
 #  
 #  
 
-package LCP::Kasai;
+package LCP::Manzini;
 
 use vars qw($VERSION);
 
@@ -28,20 +28,18 @@ $VERSION = '0.01';
 use strict;
 use Carp;
 
-
 =pod
-
 =head1 NAME
 
-LCP::Kasai - Longest common prefix computation strategy
+LCP::Manzini - Longest common prefix computation strategy
 
 =head1 SYNOPSIS
 
-    use LCP::Kasai;
+    use LCP::Manzini;
 
-    my $Kasai = LCP::Kasai->new();
-
-    my $LCPArrayRef =$Kasai->lcp(suftab => \@suftab, string => \@strarr);
+    my $Manzini = LCP::Manzini->new();
+    
+    my $LCPArrayRef =$Manzini->lcp(suftab => \@suftab, string => \@strarr);
 
 =head1 DESCRIPTION
 
@@ -49,19 +47,19 @@ The longest common prefix (LCP) array is an auxiliary data structure
 to a suffix array. The array containes lengths of the longest
 common prefixes (LCPs) between all pairs of consecutive suffixes
 in a lexicographically ordered array of string suffixes. The algorithm 
-presented here is an implementation of Kasai's linear time LCP 
-construction solution [1].
+presented here is an implementation of Manzini's linear time space 
+efficient LCP construction solution [1].
 
 
 =head2 new
 
-    my $Kasai = LCP::Kasai->new();
+    my $Manzini = LCP::Manzini->new();
 
 Creates a new longest common prefix object.
 
 =head2 lcp
     
-    my $LCPArrayRef =$Kasai->lcp(suftab => \@suftab, string => \@strarr);
+    my $LCPArrayRef =$Manzini->lcp(suftab => \@suftab, string => \@strarr);
     
 
 Function requires lexicographically ordered suffix array (suftab) and a 
@@ -95,8 +93,8 @@ MA 02110-1301, USA.
 
 =head1 ACKNOWLEDGEMENT
 
-1.     Kasai et al. Linear-Time Longest-Common-Prefix Computation in 
-       Suffix Arrays and Its Applications. 2001.
+1.  Manzini, G. and Ferragina, P. Engineering a Lightweight Suffix 
+    Array Construction Algorithm.  2002.
 
 =cut
 
@@ -122,35 +120,66 @@ bless ($hash,$class);
 #               FUNCTIONS
 #################################################
 #################################################
-sub lcp {  # Kasai's algorithm
+sub lcp {  # Manzini's algorithm
 #################################################
 
 my ($self,%arg) = @_;
 
-my @sufinv = ();
-for (0..$#{$arg{string}}){
-	$sufinv[$arg{suftab}->[$_]] = $_;
-}
-my $h = 0;
+my @lcp = (0);
+my @occ = ();
 
-my @lcp  = (0);
+my ($i,$h,$j,$k,$nextk)=(0,0,0,0,-1);
 
-for (0..$#{$arg{string}}){ 
-	if($sufinv[$_] >= 1){
-		my $k = $arg{suftab}->[$sufinv[$_] - 1];
-		while($arg{string}->[$_ + $h] eq $arg{string}->[$k + $h]){
-			$h++;
-		}
-		$lcp [$sufinv[$_]] = $h;
-		if($h>0){
-			$h--;
-		}
-		else{
-			$h = 0;
-		}
-	}
+for($i = 0; $i< $#{$arg{string}}; $i++){
+   $occ[ord($arg{string}->[$i])]++;
 }
-return \@lcp ;
+
+  $k = $self->_rank_next(string => $arg{string}, 
+                 suftab =>  $arg{suftab}, 
+                 occ=> \@occ, 
+                 rank_next => \@lcp); 
+
+  $h = 0;
+  for($i=0; $i<$#{$arg{string}}; $i++,$k=$nextk) { 
+    $nextk=$lcp[$k];
+		if($k>0) {
+         $j = $arg{suftab}->[$k-1];
+         while($i+$h<$#{$arg{string}} && $j+$h<$#{$arg{string}} && $arg{string}->[$i+$h] eq $arg{string}->[$j+$h]){
+				$h++;
+         }
+         $lcp[$k]=$h;
+      }
+      if($h>0){ $h--};
+  }
+return \@lcp;
+}
+
+#################################################
+sub _rank_next {  
+#################################################
+my ($self,%arg) = @_;
+
+my ($i,$j,$c,$r0)=(0,0,0,0);
+my @count;
+
+for($i=1;$i<256;$i++){
+   $count[$i] = $count[$i-1] + $arg{occ}->[$i-1];
+}
+
+$j = ++$count[$arg{string}->[$#{$arg{string}}-1]]; 
+$arg{rank_next}->[$j]=0;
+for($i=1;$i<=$#{$arg{string}};$i++){
+   if($arg{suftab}->[$i] == 0){
+      $r0 = $i;
+   }else{
+      $c = $arg{string}->[$arg{suftab}->[$i] - 1];
+      $count[ord($c)]++;
+      $j = $count[ord($c)];
+      $arg{rank_next}->[$j]=$i;
+   }
+}
+
+return $r0;
 }
 
 1;

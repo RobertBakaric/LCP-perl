@@ -24,7 +24,7 @@ package SA::SuffixArray;
 
 use vars qw($VERSION);
 
-$VERSION = '1.00';
+$VERSION = '0.01';
 
 use strict;
 use Carp;
